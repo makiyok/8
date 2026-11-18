@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import card %}
+{% block title %}収穫体験をさがす｜八幡平収穫体験{% endblock %}
+
+{% block content %}
+<div class="list-head">
+  {% if active_category %}
+    <img src="{{ url_for('static', filename='img/crops/' ~ active_category.image) }}" alt="" width="64" height="64">
+    <h1>{{ active_category.label }}</h1>
+  {% else %}
+    <h1>収穫体験をさがす</h1>
+  {% endif %}
+</div>
+
+<form class="filters" method="get" action="{{ url_for('shop.experiences') }}">
+  {{ form.q(placeholder="キーワード", maxlength=50, **{"aria-label": "キーワード"}) }}
+  {{ form.category(**{"aria-label": "種類"}) }}
+  {{ form.prefecture(**{"aria-label": "都道府県"}) }}
+  {{ form.month(**{"aria-label": "時期"}) }}
+  <button type="submit" class="btn">絞り込む</button>
+</form>
+
+<p class="muted">{{ items | length }}件{% if items | length == 60 %}（先頭の60件を表示）{% endif %}</p>
+{% if items %}
+  <div class="card-grid">{% for e in items %}{{ card(e) }}{% endfor %}</div>
+{% else %}
+  <div class="empty">
+    <img src="{{ url_for('static', filename='img/crops/other.svg') }}" alt="" width="96" height="96">
+    <p>条件に合う体験が見つかりませんでした。</p>
+  </div>
+{% endif %}
+{% endblock %}

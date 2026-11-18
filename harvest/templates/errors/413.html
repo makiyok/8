@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="empty">
+  <img src="{{ url_for('static', filename='img/crops/other.svg') }}" alt="" width="96" height="96">
+  <h1>ファイルが大きすぎます</h1>
+  <p>写真は1枚5MBまで、1回に8枚までにしてください。<a href="{{ url_for('shop.index') }}">トップへ戻る</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}ログイン｜八幡平収穫体験{% endblock %}
+{% block content %}
+<div class="auth-box">
+  <img src="{{ url_for('static', filename='img/crops/ringo.svg') }}" alt="" width="72" height="72">
+  <h1>ログイン</h1>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    {{ field(form.email, autocomplete="email") }}
+    {{ field(form.password, autocomplete="current-password") }}
+    <button type="submit" class="btn btn-block">ログイン</button>
+  </form>
+  <p class="muted center">はじめての方は <a href="{{ url_for('auth.register') }}">会員登録</a> / <a href="{{ url_for('auth.producer_register') }}">生産者登録</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}{{ experience.title }}｜八幡平収穫体験{% endblock %}
+
+{% block content %}
+{% if not experience.is_published %}
+  <div class="flash">この体験は非公開です（出品者のあなただけが見られます）</div>
+{% endif %}
+
+<p class="crumbs">
+  <a href="{{ url_for('shop.experiences') }}">体験をさがす</a> ›
+  <a href="{{ url_for('shop.experiences', category=experience.category) }}">{{ experience.category_label }}</a>
+</p>
+
+<div class="detail">
+  <div class="gallery">
+    {% if experience.photos %}
+      {# CSS だけで切り替えるギャラリー（JavaScript なし） #}
+      {% for p in experience.photos %}
+        <input type="radio" name="g" id="g{{ loop.index }}" {% if loop.first %}checked{% endif %}>
+      {% endfor %}
+      <div class="gallery-main">
+        {% for p in experience.photos %}
+          <img class="slide s{{ loop.index }}" src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" alt="{{ experience.title }}の写真{{ loop.index }}">
+        {% endfor %}
+      </div>
+      {% if experience.photos | length > 1 %}
+        <div class="thumbs">
+          {% for p in experience.photos %}
+            <label for="g{{ loop.index }}"><img src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" alt="写真{{ loop.index }}を表示" loading="lazy"></label>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% else %}
+      <div class="gallery-main">{{ cover(experience, "slide only") }}</div>
+    {% endif %}
+  </div>
+
+  <div class="detail-info">
+    <span class="badge static">{{ experience.category_label }}</span>
+    <h1>{{ experience.title }}</h1>
+    <p class="muted">{{ experience.prefecture }}・{{ experience.producer.farm_name or experience.producer.name }}</p>
+    <dl class="facts">
+      <div><dt>料金</dt><dd class="price">{{ experience.price | yen }}<small>/人</small></dd></div>
+      <div><dt>持ち帰り</dt><dd>1人 {{ experience.take_home_amount }}{{ experience.take_home_unit }}まで</dd></div>
+      <div><dt>受付期間</dt><dd>{{ experience.season_start | date_jp }}〜{{ experience.season_end | date_jp }}</dd></div>
+      <div><dt>受付時間</dt><dd>{{ experience.hours }}</dd></div>
+      <div><dt>1日の定員</dt><dd>{{ experience.daily_capacity }}人</dd></div>
+      <div><dt>集合場所</dt><dd>{{ experience.address }}</dd></div>
+    </dl>
+
+    <div class="book">
+      <h2>予約する</h2>
+      {% if current_user.is_authenticated and current_user.id == experience.producer_id %}
+        <p class="muted">ご自身の体験です。<a href="{{ url_for('producer.edit', experience_id=experience.id) }}">編集する</a></p>
+      {% elif experience.season_end <= today %}
+        <p class="muted">今シーズンの受付は終了しました。</p>
+      {% elif not current_user.is_authenticated %}
+        <p><a class="btn" href="{{ url_for('auth.login', next=request.path) }}">ログインして予約する</a></p>
+      {% elif experience.is_published %}
+        <form method="post" action="{{ url_for('reservations.create', experience_id=experience.id) }}">
+          {{ form.hidden_tag() }}
+          <label>{{ form.visit_date.label.text }}
+            {{ form.visit_date(min=min_date, max=experience.season_end) }}
+          </label>
+          <label>{{ form.people.label.text }}
+            {{ form.people(min=1, max=20) }}
+          </label>
+          <p class="muted">料金は 人数 × {{ experience.price | yen }} です。次の画面（Stripe）でカード決済すると予約が確定します。</p>
+          <button type="submit" class="btn btn-block">お支払いへ進む</button>
+        </form>
+      {% endif %}
+      <p class="muted">キャンセル規定：2日前まで無料／前日は料金の50％／当日は取り消しできません。</p>
+    </div>
+  </div>
+</div>
+
+<section class="desc">
+  <h2>体験の内容</h2>
+  <p class="pre">{{ experience.description }}</p>
+</section>
+
+{% if experience.producer.farm_intro %}
+<section class="farm">
+  <img src="{{ url_for('static', filename='img/crops/' ~ experience.fallback_image) }}" alt="" width="80" height="80">
+  <div>
+    <h2>{{ experience.producer.farm_name }}</h2>
+    <p class="pre">{{ experience.producer.farm_intro }}</p>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

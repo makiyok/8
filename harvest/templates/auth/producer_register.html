@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}生産者登録｜八幡平収穫体験{% endblock %}
+{% block content %}
+<div class="auth-box wide">
+  <div class="illust-row" aria-hidden="true">
+    {% for key in ["daikon", "negi", "gobo", "tomato", "mikan"] %}
+      <img src="{{ url_for('static', filename='img/crops/' ~ CATEGORIES[key].image) }}" alt="" width="56" height="56">
+    {% endfor %}
+  </div>
+  <h1>生産者登録</h1>
+  <p class="muted">登録すると、収穫体験を出品できます。時期・持ち帰りの量・値段は、体験ごとに自由に決められます。</p>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    <fieldset>
+      <legend>農園の情報</legend>
+      {{ field(form.farm_name) }}
+      {{ field(form.prefecture) }}
+      {{ field(form.farm_intro, rows=4, hint="体験の詳細ページに表示されます") }}
+    </fieldset>
+    <fieldset>
+      <legend>ご担当者</legend>
+      {{ field(form.name, autocomplete="name") }}
+      {{ field(form.email, autocomplete="email") }}
+      {{ field(form.password, autocomplete="new-password") }}
+      {{ field(form.password_confirm, autocomplete="new-password") }}
+    </fieldset>
+    <label class="check">{{ form.agree() }} {{ form.agree.label.text }}</label>
+    {% for e in form.agree.errors %}<small class="error">{{ e }}</small>{% endfor %}
+    <button type="submit" class="btn btn-block">生産者として登録する</button>
+  </form>
+</div>
+{% endblock %}

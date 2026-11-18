@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}予約一覧｜八幡平収穫体験{% endblock %}
+{% block content %}
+<h1>予約一覧</h1>
+{% if items %}
+  <div class="manage-list">
+    {% for r in items %}
+      <a class="manage-row link" href="{{ url_for('reservations.show', reservation_id=r.id) }}">
+        {{ cover(r.experience, "thumb") }}
+        <div class="grow">
+          <strong>{{ r.experience.title }}</strong>
+          <span class="tag {{ 'on' if r.status == 'reserved' and r.visit_date >= today else ('wait' if r.is_payable else 'off') }}">{{ '来園済み' if r.status == 'reserved' and r.visit_date < today else r.status_label }}</span>
+          <p class="muted">{{ r.visit_date | date_jp }}・{{ r.people }}人・{{ r.total | yen }}</p>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">
+    <img src="{{ url_for('static', filename='img/crops/blueberry.svg') }}" alt="" width="96" height="96">
+    <p>まだ予約がありません。<a href="{{ url_for('shop.experiences') }}">収穫体験をさがす</a></p>
+  </div>
+{% endif %}
+{% endblock %}

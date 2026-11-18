@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}{{ "体験の編集" if experience else "体験の出品" }}｜八幡平収穫体験{% endblock %}
+{% block content %}
+<h1>{{ "体験の編集" if experience else "新しい収穫体験を出品" }}</h1>
+
+{% if experience %}
+<section class="photo-manage">
+  <h2>登録済みの写真（{{ experience.photos | length }}/{{ config.MAX_PHOTOS }}枚）</h2>
+  {% if experience.photos %}
+    <div class="photo-grid">
+      {% for p in experience.photos %}
+        <figure>
+          <img src="{{ url_for('static', filename='uploads/' ~ p.filename) }}" alt="写真{{ loop.index }}">
+          <figcaption>
+            {% if loop.first %}<span class="tag on">表紙</span>{% endif %}
+            <form method="post" action="{{ url_for('producer.delete_photo', photo_id=p.id) }}" class="inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-link danger">削除</button>
+            </form>
+          </figcaption>
+        </figure>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">写真がない間は、種類のイラストが表示されます。畑や収穫物の写真を載せると予約が入りやすくなります。</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data" novalidate class="exp-form">
+  {{ form.hidden_tag() }}
+  <fieldset>
+    <legend>どんな体験？</legend>
+    {{ field(form.title, placeholder="例: 畑でまるごと！青首大根抜き") }}
+    {{ field(form.category) }}
+    {{ field(form.description, rows=6, placeholder="体験の流れ、服装、持ち物、駐車場など") }}
+  </fieldset>
+  <fieldset>
+    <legend>場所と時期</legend>
+    <div class="grid2">
+      {{ field(form.prefecture) }}
+      {{ field(form.hours) }}
+    </div>
+    {{ field(form.address) }}
+    <div class="grid2">
+      {{ field(form.season_start) }}
+      {{ field(form.season_end) }}
+    </div>
+  </fieldset>
+  <fieldset>
+    <legend>持ち帰りの量と値段</legend>
+    <div class="grid3">
+      {{ field(form.take_home_amount, min=1, max=1000) }}
+      {{ field(form.take_home_unit) }}
+      {{ field(form.price, min=100, max=100000, step=10) }}
+    </div>
+    {{ field(form.daily_capacity, min=1, max=500, hint="1日に受け入れられる人数の合計") }}
+  </fieldset>
+  <fieldset>
+    <legend>写真</legend>
+    {{ field(form.photos, accept="image/jpeg,image/png,image/webp", multiple=True, hint="1枚目が表紙になります。撮影場所などの情報は自動で消してから公開します") }}
+  </fieldset>
+  <label class="check">{{ form.is_published() }} {{ form.is_published.label.text }}</label>
+  <button type="submit" class="btn btn-block">保存する</button>
+</form>
+
+{% if experience %}
+<form method="post" action="{{ url_for('producer.delete', experience_id=experience.id) }}" class="danger-zone">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <button type="submit" class="btn btn-danger">この体験を削除する</button>
+</form>
+{% endif %}
+{% endblock %}

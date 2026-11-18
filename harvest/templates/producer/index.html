@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}出品管理｜八幡平収穫体験{% endblock %}
+{% block content %}
+<div class="list-head between">
+  <h1>{{ current_user.farm_name }} の収穫体験</h1>
+  <a class="btn" href="{{ url_for('producer.new') }}">＋ 新しい体験を出品</a>
+</div>
+{% if items %}
+  <div class="manage-list">
+    {% for e in items %}
+      <div class="manage-row">
+        {{ cover(e, "thumb") }}
+        <div class="grow">
+          <strong>{{ e.title }}</strong>
+          <span class="tag {{ 'on' if e.is_published else 'off' }}">{{ "公開中" if e.is_published else "非公開" }}</span>
+          <p class="muted">{{ e.category_label }}・{{ e.season_start | date_jp }}〜{{ e.season_end | date_jp }}・{{ e.price | yen }}/人・持ち帰り {{ e.take_home_amount }}{{ e.take_home_unit }}・写真 {{ e.photos | length }}枚</p>
+        </div>
+        <div class="actions">
+          <a href="{{ url_for('shop.detail', experience_id=e.id) }}">表示</a>
+          <a class="btn btn-small" href="{{ url_for('producer.edit', experience_id=e.id) }}">編集</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="empty">
+    <img src="{{ url_for('static', filename='img/crops/daikon.svg') }}" alt="" width="96" height="96">
+    <p>まだ体験がありません。最初の収穫体験を出品しましょう。</p>
+  </div>
+{% endif %}
+{% endblock %}

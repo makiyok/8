@@ -1,0 +1,34 @@
+{% macro cover(experience, cls="") -%}
+  {%- if experience.photos -%}
+    <img class="{{ cls }}" src="{{ url_for('static', filename='uploads/' ~ experience.photos[0].filename) }}" alt="{{ experience.title }}" loading="lazy">
+  {%- else -%}
+    <img class="{{ cls }} illust" src="{{ url_for('static', filename='img/crops/' ~ experience.fallback_image) }}" alt="{{ experience.category_label }}" loading="lazy">
+  {%- endif -%}
+{%- endmacro %}
+
+{% macro card(e) -%}
+<a class="card" href="{{ url_for('shop.detail', experience_id=e.id) }}">
+  <div class="card-img">
+    {{ cover(e) }}
+    <span class="badge">{{ e.category_label }}</span>
+  </div>
+  <div class="card-body">
+    <h3>{{ e.title }}</h3>
+    <p class="muted">{{ e.prefecture }}・{{ e.producer.farm_name or e.producer.name }}</p>
+    <p class="muted">{{ e.season_start | date_jp }}〜{{ e.season_end | date_jp }}</p>
+    <div class="card-foot">
+      <span class="take">持ち帰り {{ e.take_home_amount }}{{ e.take_home_unit }}まで</span>
+      <span class="price">{{ e.price | yen }}<small>/人</small></span>
+    </div>
+  </div>
+</a>
+{%- endmacro %}
+
+{% macro field(f, hint=None) -%}
+<label>
+  {{ f.label.text }}
+  {{ f(**kwargs) }}
+  {% if hint %}<small class="muted">{{ hint }}</small>{% endif %}
+  {% for e in f.errors %}<small class="error">{{ e }}</small>{% endfor %}
+</label>
+{%- endmacro %}

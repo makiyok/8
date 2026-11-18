@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import cover %}
+{% block title %}予約の詳細｜八幡平収穫体験{% endblock %}
+{% block content %}
+<div class="ticket">
+  {{ cover(r.experience, "ticket-img") }}
+  <div class="ticket-body">
+    <span class="tag {{ 'on' if r.status == 'reserved' else 'off' }}">{{ r.status_label }}</span>
+    <h1>{{ r.experience.title }}</h1>
+    <dl class="facts">
+      <div><dt>予約番号</dt><dd>#{{ "%06d" | format(r.id) }}</dd></div>
+      <div><dt>来園日</dt><dd>{{ r.visit_date | date_jp }}（{{ r.experience.hours }}）</dd></div>
+      <div><dt>人数</dt><dd>{{ r.people }}人</dd></div>
+      <div><dt>持ち帰り</dt><dd>1人 {{ r.experience.take_home_amount }}{{ r.experience.take_home_unit }}まで</dd></div>
+      <div><dt>料金</dt><dd class="price">{{ r.total | yen }}<small>（{{ r.unit_price | yen }} × {{ r.people }}人・カード決済）</small></dd></div>
+      {% if r.paid_at %}<div><dt>支払日時</dt><dd>{{ r.paid_at | date_jp }} {{ r.paid_at.strftime("%H:%M") }}</dd></div>{% endif %}
+      {% if r.cancel_fee %}<div><dt>キャンセル料</dt><dd>{{ r.cancel_fee | yen }}</dd></div>{% endif %}
+      {% if r.refunded_at %}<div><dt>返金</dt><dd>{{ r.refund_amount | yen }}（{{ r.refunded_at | date_jp }}に返金手続き済み）</dd></div>{% endif %}
+      <div><dt>集合場所</dt><dd>{{ r.experience.address }}</dd></div>
+      <div><dt>農園</dt><dd>{{ r.experience.producer.farm_name }}</dd></div>
+    </dl>
+    {% if r.is_payable %}
+      <p class="muted">{{ r.hold_until.strftime("%H:%M") }}までにお支払いがないと、予約は自動で取り消されます。</p>
+      <div class="btn-row">
+        <form method="post" action="{{ url_for('reservations.pay', reservation_id=r.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn">お支払いへ進む</button>
+        </form>
+        <form method="post" action="{{ url_for('reservations.cancel', reservation_id=r.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-outline">予約をやめる</button>
+        </form>
+      </div>
+    {% elif fee is not none %}
+      {% if fee %}
+        <div class="flash">本日は来園日の前日のため、キャンセル料 {{ fee_percent }}％（{{ fee | yen }}）がかかります。返金額は {{ (r.total - fee) | yen }} です。</div>
+      {% endif %}
+      <form method="post" action="{{ url_for('reservations.cancel', reservation_id=r.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn btn-danger">
+          予約を取り消す（{{ "返金 " ~ ((r.total - fee) | yen) if fee else "全額返金" }}）
+        </button>
+      </form>
+    {% endif %}
+    {% if r.status == "reserved" %}
+      <p class="muted">キャンセル規定：2日前まで無料（全額返金）／前日 {{ fee_percent }}％／当日は取り消しできません。</p>
+    {% endif %}
+  </div>
+</div>
+<p><a href="{{ url_for('reservations.index') }}">← 予約一覧へ</a></p>
+{% endblock %}

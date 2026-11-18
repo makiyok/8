@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="empty">
+  <img src="{{ url_for('static', filename='img/crops/kaki.svg') }}" alt="" width="96" height="96">
+  <h1>この画面は表示できません</h1>
+  <p>権限がありません。<a href="{{ url_for('shop.index') }}">トップへ戻る</a></p>
+</div>
+{% endblock %}

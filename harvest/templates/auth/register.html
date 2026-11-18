@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "_macros.html" import field %}
+{% block title %}会員登録｜八幡平収穫体験{% endblock %}
+{% block content %}
+<div class="auth-box">
+  <img src="{{ url_for('static', filename='img/crops/ichigo.svg') }}" alt="" width="72" height="72">
+  <h1>会員登録</h1>
+  <p class="muted">収穫体験を予約する方の登録です。生産者の方は<a href="{{ url_for('auth.producer_register') }}">生産者登録</a>へ。</p>
+  <form method="post" novalidate>
+    {{ form.hidden_tag() }}
+    {{ field(form.name, autocomplete="name") }}
+    {{ field(form.email, autocomplete="email") }}
+    {{ field(form.password, autocomplete="new-password") }}
+    {{ field(form.password_confirm, autocomplete="new-password") }}
+    <button type="submit" class="btn btn-block">登録する</button>
+  </form>
+</div>
+{% endblock %}

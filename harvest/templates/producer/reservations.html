@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}予約の確認｜八幡平収穫体験{% endblock %}
+{% block content %}
+<h1>これからの予約</h1>
+{% if items %}
+  <table class="table">
+    <thead><tr><th>来園日</th><th>体験</th><th>お客さま</th><th>人数</th><th>料金（支払い済み）</th></tr></thead>
+    <tbody>
+      {% for r in items %}
+        <tr>
+          <td>{{ r.visit_date | date_jp }}</td>
+          <td>{{ r.experience.title }}</td>
+          <td>{{ r.user.name }}さま</td>
+          <td>{{ r.people }}人</td>
+          <td>{{ r.total | yen }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p class="empty">これからの予約はありません。</p>
+{% endif %}
+{% endblock %}
