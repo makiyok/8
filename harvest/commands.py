@@ -1,8 +1,10 @@
 """開発用のコマンド。`uv run flask seed` でサンプルの生産者と収穫体験を作る"""
 
+import os
 from datetime import date, timedelta
 
 import click
+from flask import current_app
 
 from harvest.extensions import db
 from harvest.models import Experience, Role, User
@@ -18,7 +20,15 @@ SAMPLES = [
     ("ichigo", "甘さ自慢のいちご狩り", "堀切", 1, "パック", 2000, 30, 170),
     ("imo", "親子でさつまいも掘り", "荒屋", 3, "kg", 1000, -60, 10),
     ("ringo", "りんご狩りとジュース試飲", "細野", 5, "個", 1600, -25, 25),
+    ("other", "朝もぎ とうもろこし収穫", "長者屋敷", 4, "本", 1200, -10, 50),
 ]
+
+# 作物名は自由入力。分類（category）に無い作物は "other" にする
+CROP_NAMES = {
+    "daikon": "青首大根", "mikan": "温州みかん", "blueberry": "ブルーベリー",
+    "kaki": "富有柿", "negi": "長ネギ", "gobo": "ゴボウ", "tomato": "トマト",
+    "ichigo": "いちご", "imo": "さつまいも", "ringo": "りんご", "other": "とうもろこし",
+}  # fmt: skip
 
 
 def init_app(app):
@@ -28,6 +38,12 @@ def init_app(app):
         if db.session.query(User).filter_by(email="farm@example.com").first():
             click.echo("すでにサンプルがあります")
             return
+        # 公開した環境では、誰でも知っているパスワードにしない（SEED_PASSWORD で決める）
+        password = os.environ.get("SEED_PASSWORD") or "password1234"
+        if current_app.config["PRODUCTION"] and password == "password1234":
+            raise click.ClickException(
+                "本番では SEED_PASSWORD を設定してから実行してください"
+            )
         farmer = User(
             email="farm@example.com",
             name="山田 太郎",
@@ -36,9 +52,9 @@ def init_app(app):
             prefecture="岩手県",
             farm_intro="家族で営む小さな農園です。",
         )
-        farmer.set_password("password1234")
+        farmer.set_password(password)
         customer = User(email="guest@example.com", name="佐藤 花子")
-        customer.set_password("password1234")
+        customer.set_password(password)
         db.session.add_all([farmer, customer])
         today = date.today()
         for cat, title, pref, amount, unit, price, start, end in SAMPLES:
@@ -46,6 +62,7 @@ def init_app(app):
                 Experience(
                     producer=farmer,
                     title=title,
+                    crop_name=CROP_NAMES[cat],
                     category=cat,
                     description=(
                         f"{title}。自分の手で収穫した{amount}{unit}までお持ち帰りいただけます。"
@@ -64,6 +81,5 @@ def init_app(app):
                 )
             )
         db.session.commit()
-        click.echo(
-            "サンプルを作りました（farm@example.com / guest@example.com、パスワード password1234）"
-        )
+        # パスワードはログに出さない（本番のログは Render の画面に残る）
+        click.echo("サンプルを作りました（farm@example.com / guest@example.com）")

@@ -7,6 +7,18 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from harvest.extensions import csrf, db, login_manager, migrate
 
 
+def database_url() -> str:
+    """DATABASE_URL を SQLAlchemy の形にする。
+
+    Render などが渡す postgres:// / postgresql:// は、ドライバーを psycopg（v3）に指定する
+    """
+    url = os.environ.get("DATABASE_URL") or "sqlite:///harvest.sqlite"
+    for prefix in ("postgres://", "postgresql://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url[len(prefix) :]
+    return url
+
+
 def create_app(config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
@@ -17,9 +29,7 @@ def create_app(config=None):
     app.config.from_mapping(
         PRODUCTION=production,
         SECRET_KEY=os.environ.get("SECRET_KEY") or None,
-        SQLALCHEMY_DATABASE_URI=os.environ.get(
-            "DATABASE_URL", "sqlite:///harvest.sqlite"
-        ),
+        SQLALCHEMY_DATABASE_URI=database_url(),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=production
@@ -44,7 +54,10 @@ def create_app(config=None):
             raise RuntimeError("本番では SECRET_KEY を環境変数に設定してください")
         app.config["SECRET_KEY"] = "dev-only-not-secret"
     if app.config["PRODUCTION"]:
-        hosts = os.environ.get("TRUSTED_HOSTS", "")
+        # Render では、公開 URL のホスト名が RENDER_EXTERNAL_HOSTNAME に入る
+        hosts = os.environ.get("TRUSTED_HOSTS") or os.environ.get(
+            "RENDER_EXTERNAL_HOSTNAME", ""
+        )
         if not hosts:
             raise RuntimeError(
                 "本番では TRUSTED_HOSTS（例: example.com）を設定してください"

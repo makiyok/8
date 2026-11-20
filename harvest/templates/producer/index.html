@@ -14,7 +14,7 @@
         <div class="grow">
           <strong>{{ e.title }}</strong>
           <span class="tag {{ 'on' if e.is_published else 'off' }}">{{ "公開中" if e.is_published else "非公開" }}</span>
-          <p class="muted">{{ e.category_label }}・{{ e.season_start | date_jp }}〜{{ e.season_end | date_jp }}・{{ e.price | yen }}/人・持ち帰り {{ e.take_home_amount }}{{ e.take_home_unit }}・写真 {{ e.photos | length }}枚</p>
+          <p class="muted">{{ e.crop_name }}（{{ e.category_label }}）・{{ e.season_start | date_jp }}〜{{ e.season_end | date_jp }}・{{ e.price | yen }}/人・持ち帰り {{ e.take_home_amount }}{{ e.take_home_unit }}・写真 {{ e.photos | length }}枚</p>
         </div>
         <div class="actions">
           <a href="{{ url_for('shop.detail', experience_id=e.id) }}">表示</a>

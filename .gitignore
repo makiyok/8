@@ -6,3 +6,5 @@ __pycache__/
 .env
 instance/
 harvest/static/uploads/
+# PowerPoint が開いている間に作る一時ファイル
+~$*

@@ -14,7 +14,7 @@
 
 <form class="filters" method="get" action="{{ url_for('shop.experiences') }}">
   {{ form.q(placeholder="キーワード", maxlength=50, **{"aria-label": "キーワード"}) }}
-  {{ form.category(**{"aria-label": "種類"}) }}
+  {{ form.category(**{"aria-label": "分類"}) }}
   {{ form.prefecture(**{"aria-label": "都道府県"}) }}
   {{ form.month(**{"aria-label": "時期"}) }}
   <button type="submit" class="btn">絞り込む</button>

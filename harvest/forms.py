@@ -66,8 +66,14 @@ class LoginForm(FlaskForm):
 
 class ExperienceForm(FlaskForm):
     title = StringField("タイトル", validators=[DataRequired(), Length(max=80)])
+    crop_name = StringField(
+        "作物名（どんな作物でも可。例: ズッキーニ、栗、とうもろこし）",
+        validators=[DataRequired(), Length(max=50)],
+    )
     category = SelectField(
-        "体験の種類", choices=CATEGORY_CHOICES, validators=[DataRequired()]
+        "分類（イラストと絞り込みに使います。当てはまらなければ「その他の作物」）",
+        choices=CATEGORY_CHOICES,
+        validators=[DataRequired()],
     )
     description = TextAreaField(
         "体験の説明", validators=[DataRequired(), Length(max=3000)]
@@ -133,8 +139,8 @@ class SearchForm(FlaskForm):
 
     q = StringField("キーワード", validators=[Optional(), Length(max=50)])
     category = SelectField(
-        "種類",
-        choices=[("", "すべての種類")] + CATEGORY_CHOICES,
+        "分類",
+        choices=[("", "すべての分類")] + CATEGORY_CHOICES,
         validators=[Optional()],
     )
     prefecture = SelectField(

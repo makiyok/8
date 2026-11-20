@@ -23,7 +23,7 @@
       {% endfor %}
     </div>
   {% else %}
-    <p class="muted">写真がない間は、種類のイラストが表示されます。畑や収穫物の写真を載せると予約が入りやすくなります。</p>
+    <p class="muted">写真がない間は、分類のイラストが表示されます。畑や収穫物の写真を載せると予約が入りやすくなります。</p>
   {% endif %}
 </section>
 {% endif %}
@@ -33,6 +33,7 @@
   <fieldset>
     <legend>どんな体験？</legend>
     {{ field(form.title, placeholder="例: 畑でまるごと！青首大根抜き") }}
+    {{ field(form.crop_name, placeholder="例: ズッキーニ、栗、とうもろこし") }}
     {{ field(form.category) }}
     {{ field(form.description, rows=6, placeholder="体験の流れ、服装、持ち物、駐車場など") }}
   </fieldset>

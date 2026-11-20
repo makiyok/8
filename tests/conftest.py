@@ -1,3 +1,4 @@
+import os
 from datetime import date, timedelta
 
 import pytest
@@ -69,7 +70,8 @@ def app(tmp_path, fake_payment):
     app = create_app(
         {
             "TESTING": True,
-            "SQLALCHEMY_DATABASE_URI": "sqlite://",
+            # 既定はメモリ上の SQLite。TEST_DATABASE_URL で PostgreSQL などでも試せる
+            "SQLALCHEMY_DATABASE_URI": os.environ.get("TEST_DATABASE_URL", "sqlite://"),
             "WTF_CSRF_ENABLED": False,
             "UPLOAD_FOLDER": str(tmp_path / "uploads"),
             "SECRET_KEY": "test",
@@ -126,6 +128,7 @@ def experience(producer):
     e = Experience(
         producer_id=producer.id,
         title="テスト畑の大根",
+        crop_name="青首大根",
         category="daikon",
         description="説明",
         prefecture="岩手県",

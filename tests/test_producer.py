@@ -22,6 +22,7 @@ def form_data(**overrides):
     today = date.today()
     data = {
         "title": "ミカン狩り",
+        "crop_name": "温州みかん",
         "category": "mikan",
         "description": "甘いミカン",
         "prefecture": "岩手県",
@@ -135,3 +136,34 @@ def test_pages_render(client, experience):
         "/login",
     ]:
         assert client.get(path).status_code == 200, path
+
+
+def test_any_crop_can_be_listed(client, producer):
+    """作物の種類は限定しない：分類に無い作物も「その他」で出品でき、名前で探せる"""
+    login(client, producer.email)
+    r = client.post(
+        "/producer/experiences/new",
+        data=form_data(
+            title="夏のズッキーニ収穫", crop_name="ズッキーニ", category="other"
+        ),
+    )
+    assert r.status_code == 302
+    e = db.session.scalar(db.select(Experience))
+    assert e.crop_name == "ズッキーニ" and e.category == "other"
+    body = client.get("/experiences?q=ズッキーニ").get_data(as_text=True)
+    assert "夏のズッキーニ収穫" in body
+    assert "ズッキーニ" in client.get(f"/experiences/{e.id}").get_data(as_text=True)
+
+
+def test_crop_name_required(client, producer):
+    login(client, producer.email)
+    r = client.post("/producer/experiences/new", data=form_data(crop_name=""))
+    assert r.status_code == 200
+    assert db.session.scalar(db.select(Experience)) is None
+
+
+def test_unknown_category_rejected(client, producer):
+    login(client, producer.email)
+    r = client.post("/producer/experiences/new", data=form_data(category="hacked"))
+    assert r.status_code == 200
+    assert db.session.scalar(db.select(Experience)) is None

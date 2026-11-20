@@ -29,7 +29,7 @@ from harvest.uploads import ImageError, delete_image, save_image
 bp = Blueprint("producer", __name__, url_prefix="/producer")
 
 FIELDS = (
-    "title", "category", "description", "prefecture", "address",
+    "title", "crop_name", "category", "description", "prefecture", "address",
     "season_start", "season_end", "hours", "take_home_amount",
     "take_home_unit", "price", "daily_capacity", "is_published",
 )  # fmt: skip

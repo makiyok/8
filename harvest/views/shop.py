@@ -68,6 +68,7 @@ def experiences():
             stmt = stmt.where(
                 or_(
                     Experience.title.like(pattern, escape="\\"),
+                    Experience.crop_name.like(pattern, escape="\\"),
                     Experience.description.like(pattern, escape="\\"),
                     Experience.address.like(pattern, escape="\\"),
                 )

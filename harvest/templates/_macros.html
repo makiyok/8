@@ -2,7 +2,7 @@
   {%- if experience.photos -%}
     <img class="{{ cls }}" src="{{ url_for('static', filename='uploads/' ~ experience.photos[0].filename) }}" alt="{{ experience.title }}" loading="lazy">
   {%- else -%}
-    <img class="{{ cls }} illust" src="{{ url_for('static', filename='img/crops/' ~ experience.fallback_image) }}" alt="{{ experience.category_label }}" loading="lazy">
+    <img class="{{ cls }} illust" src="{{ url_for('static', filename='img/crops/' ~ experience.fallback_image) }}" alt="{{ experience.crop_name }}" loading="lazy">
   {%- endif -%}
 {%- endmacro %}
 
@@ -10,7 +10,7 @@
 <a class="card" href="{{ url_for('shop.detail', experience_id=e.id) }}">
   <div class="card-img">
     {{ cover(e) }}
-    <span class="badge">{{ e.category_label }}</span>
+    <span class="badge">{{ e.crop_name }}</span>
   </div>
   <div class="card-body">
     <h3>{{ e.title }}</h3>

@@ -1,0 +1,41 @@
+# Render の Blueprint（https://render.com/docs/blueprint-spec）
+# Render の画面で New → Blueprint → このリポジトリを選ぶと、Web サービスとデータベースが作られる
+services:
+  - type: web
+    name: hachimantai-harvest
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    # 起動のたびにマイグレーションを当て、サンプルが無ければ作ってから Web サーバーを動かす
+    startCommand: >-
+      flask --app harvest db upgrade &&
+      flask --app harvest seed &&
+      gunicorn "harvest:create_app()" --bind 0.0.0.0:$PORT --workers 2 --timeout 60
+    healthCheckPath: /
+    envVars:
+      - key: APP_ENV
+        value: production
+      # 「前日のキャンセル料」などの日付を日本時間で判断する
+      - key: TZ
+        value: Asia/Tokyo
+      - key: SECRET_KEY
+        generateValue: true
+      # サンプルのアカウント（farm@example.com / guest@example.com）のパスワード。Render の画面で確認できる
+      - key: SEED_PASSWORD
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hachimantai-harvest-db
+          property: connectionString
+      # Stripe のキーは Render の画面で入れる（このファイルには書かない）
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+
+databases:
+  - name: hachimantai-harvest-db
+    plan: free
+    region: singapore
+    databaseName: harvest

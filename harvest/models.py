@@ -66,6 +66,8 @@ class Experience(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     producer_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
     title: Mapped[str] = mapped_column(String(80))
+    # 作物名は自由入力（どんな作物でも出品できる）。category はイラストと絞り込み用の分類
+    crop_name: Mapped[str] = mapped_column(String(50), index=True)
     category: Mapped[str] = mapped_column(String(20), index=True)
     description: Mapped[str] = mapped_column(Text)
     prefecture: Mapped[str] = mapped_column(String(10), index=True)

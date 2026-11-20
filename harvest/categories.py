@@ -1,4 +1,7 @@
-"""体験の種類。キーは DB に保存する値、label は画面の表示、image は static/img/crops/ のイラスト"""
+"""体験の分類（イラストと絞り込み用）。作物そのものは限定しない（Experience.crop_name は自由入力）。
+
+キーは DB に保存する値、label は画面の表示、image は static/img/crops/ のイラスト
+"""
 
 CATEGORIES = {
     "daikon": {"label": "大根抜き", "image": "daikon.svg"},
@@ -12,7 +15,7 @@ CATEGORIES = {
     "imo": {"label": "芋掘り", "image": "imo.svg"},
     "ringo": {"label": "りんご狩り", "image": "ringo.svg"},
     "budo": {"label": "ぶどう狩り", "image": "budo.svg"},
-    "other": {"label": "その他の収穫体験", "image": "other.svg"},
+    "other": {"label": "その他の作物", "image": "other.svg"},
 }
 
 CATEGORY_CHOICES = [(key, value["label"]) for key, value in CATEGORIES.items()]

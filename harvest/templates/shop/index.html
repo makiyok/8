@@ -6,7 +6,7 @@
   <div class="wrap hero-inner">
     <div class="hero-text">
       <h1>畑で、とる。<br>持ち帰って、味わう。</h1>
-      <p>大根抜き、ミカン狩り、ブルーベリー狩り――<br>生産者さんが用意した収穫体験を、そのまま予約できます。</p>
+      <p>大根抜き、ミカン狩り、ブルーベリー狩り、そのほかどんな作物でも――<br>生産者さんが用意した収穫体験を、そのまま予約できます。</p>
       <form class="hero-search" action="{{ url_for('shop.experiences') }}" method="get">
         <input type="search" name="q" placeholder="例: 大根、愛媛、親子" maxlength="50" aria-label="キーワード">
         <button type="submit" class="btn">さがす</button>
@@ -23,7 +23,8 @@
 
 {% block content %}
 <section>
-  <h2>体験の種類からさがす</h2>
+  <h2>分類からさがす</h2>
+  <p class="muted">作物の種類は限定していません。ここに無い作物は「その他の作物」か、キーワードでさがせます。</p>
   <div class="cat-grid">
     {% for key, c in CATEGORIES.items() %}
       <a class="cat" href="{{ url_for('shop.experiences', category=key) }}">
@@ -57,7 +58,7 @@
   <img src="{{ url_for('static', filename='img/crops/gobo.svg') }}" alt="" width="96" height="96">
   <div>
     <h2>生産者のみなさまへ</h2>
-    <p>収穫の時期、持ち帰りの量、値段はすべてご自身で決められます。写真をたくさん載せて、畑の魅力を伝えましょう。</p>
+    <p>作物の種類は問いません。収穫の時期、持ち帰りの量、値段もすべてご自身で決められます。写真をたくさん載せて、畑の魅力を伝えましょう。</p>
     <a class="btn" href="{{ url_for('auth.producer_register') }}">生産者として登録する</a>
   </div>
 </section>
